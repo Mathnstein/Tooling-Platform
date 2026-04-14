@@ -1,0 +1,12 @@
+resources:
+  - ../../base
+
+configMapGenerator:
+  - name: gateway-config
+    envs:
+      - .env.gateway
+
+secretGenerator:
+  - name: messenger-credentials
+    envs:
+      - .env.messenger.secrets
