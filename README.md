@@ -48,6 +48,7 @@ Useful Commands
 
 
 ## Repo Layout
+```
 apps/                    # Top level dir for all applications
 ├── portal/              # NextJS frontend for this platform
 └── ...others/
@@ -58,3 +59,4 @@ k8s/
     └── prod/            # Production scale and secrets (Encrypted/Ignored)
 services/
 └──  gateway/            # GraphQL API
+```
