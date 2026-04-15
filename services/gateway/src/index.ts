@@ -1,46 +1,46 @@
-import { ApolloServer } from '@apollo/server';
-import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { startStandaloneServer } from '@apollo/server/standalone';
-import 'dotenv/config';
-import { closeRabbitMQConnection, initRabbitMQ } from './lib/rabbitmq.js';
-import { resolvers } from './lib/resolvers.js';
-import { typeDefs } from './schema/index.js';
+import { GatewayServer } from '#/core/server.js';
 
-const channel = await initRabbitMQ();
+const server = new GatewayServer();
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  introspection: isDevelopment, // Enable introspection in development for tools like GraphQL Playground
-  plugins: [
-    isDevelopment
-      ? ApolloServerPluginLandingPageLocalDefault({ embed: true }) // Use GraphQL Playground in development
-      : ApolloServerPluginLandingPageDisabled() // Disable landing page in production
-  ]
-});
-
-// Pull port from env, default to 4000
-const port = parseInt(process.env.PORT || '4000', 10);
-
-// Start the server
-const { url } = await startStandaloneServer(server, {
-  listen: { port },
-  context: async () => {
-    // Create and return the context for each request
-    const amqpChannel = channel; // Use the initialized AMQP channel
-    return { amqpChannel };
+/**
+ * Bootstrap function to start the Gateway Server. This function initializes the server and handles any errors that may occur during startup.
+ * If the server starts successfully, it will log a message indicating that it is ready. If there is an error during startup, it will log the error and exit the process with a non-zero status code.
+ */
+const bootstrap = async () => {
+  try {
+    await server.start();
+  } catch (err) {
+    console.error('Failed to start Gateway Server:', err);
+    process.exit(1);
   }
-});
+}
 
-console.log(`Gateway ready at: ${url}`);
-
+/**
+ * Handles graceful shutdown of the Gateway Server. This function is triggered by termination signals (e.g., SIGINT, SIGTERM) and ensures that the server stops gracefully, releasing all resources and closing connections.
+ * @param signal The signal that triggered the shutdown.
+ */
 const shutdown = async (signal: string) => {
-  console.log(`Received ${signal}, shutting down...`);
-  await closeRabbitMQConnection();
-  process.exit(0);
+  console.log(`\nReceived ${signal}, initiating graceful shutdown...`);
+
+  // Set a forced timeout in case things hang during stop
+  const forceExit = setTimeout(() => {
+    console.error('Graceful shutdown timed out, forcing exit.');
+    process.exit(1);
+  }, 5000);
+
+  try {
+    await server.stop();
+    clearTimeout(forceExit);
+    console.log('Successfully shut down services. Goodbye!');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error during shutdown:', err);
+    process.exit(1);
+  }
 };
 
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
+// Listen for termination signals
+['SIGINT', 'SIGTERM'].forEach(signal => process.on(signal, () => shutdown(signal)));
+
+// Let's go
+bootstrap();
