@@ -39,7 +39,9 @@ cluster-down:
 forward-rabbit:
 	@echo "Forwarding RabbitMQ ports..."
 	@kubectl port-forward svc/platform-tooling-messenger-service $(RABBIT_MGMT_PORT):15672 > /dev/null 2>&1 &
+	@kubectl port-forward svc/platform-tooling-messenger-service $(RABBIT_AMQP_PORT):5672 > /dev/null 2>&1 &
 	@echo "RabbitMQ UI: http://localhost:$(RABBIT_MGMT_PORT)"
+	@echo "RabbitMQ AMQP: amqp://localhost:$(RABBIT_AMQP_PORT)"
 	@echo "Run 'make forward-stop' to close connections."
 
 forward-stop:
