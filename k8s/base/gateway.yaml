@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: tooling-platform-gateway:local
+          image: platform-tooling-gateway:local
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -27,7 +27,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-service
+  name: platform-tooling-gateway-service
 spec:
   selector:
     app: gateway

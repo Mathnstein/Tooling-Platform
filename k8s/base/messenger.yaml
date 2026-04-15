@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: messenger
+  name: messenger-deployment
 spec:
   replicas: 1
   selector:
@@ -15,9 +15,17 @@ spec:
       containers:
         - name: rabbitmq
           image: rabbitmq:4.2.5-management-alpine
-          envFrom:
-            - secretRef:
-                name: messenger-credentials
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: messenger-credentials
+                  key: username
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: messenger-credentials
+                  key: password
           ports:
             - containerPort: 5672 # AMQP
             - containerPort: 15672 # Management
@@ -25,7 +33,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: messenger-service
+  name: platform-tooling-messenger-service
 spec:
   selector:
     app: messenger

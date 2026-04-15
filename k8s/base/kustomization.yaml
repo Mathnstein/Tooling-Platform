@@ -1,3 +1,4 @@
 resources:
+  - frontend.yaml
   - gateway.yaml
   - messenger.yaml

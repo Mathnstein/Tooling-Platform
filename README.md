@@ -40,11 +40,16 @@ make sync-all
 ```
 
 ## Development Workflow
+1. _make init-envs_: Create the require .env files (may need to go adjust contents for your session)
+2. _make cluster-up_: Setup the k3d cluster
+3. _make apply-all_ **or** _make sync-all_: Import all existing images **or** build and then import all images
+4. _make forward-rabbit_: If you want to expose the RabbitMQ UI
+5.  _make forward-stop_: Stop all port forwarding 
+6. _make cluster-down_: Shut down the cluster, removing all containers
+
 Useful Commands
-- _make sync-all_	Full rebuild and deploy of all services.
 - _make logs_	Stream interleaved logs from all containers.
 - _make status_	Check the health of pods, services, and configmaps.
-- _kubectl apply -k k8s/environments/dev_	Manual Kustomize apply (triggers rolling restarts).
 
 
 ## Repo Layout

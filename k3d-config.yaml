@@ -1,0 +1,27 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: platform-tooling-cluster
+servers: 1
+agents: 2
+image: rancher/k3s:v1.30.0-k3s1
+ports:
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+options:
+  k3d:
+    wait: true
+    timeout: "60s"
+  runtime:
+    labels:
+      - label: "com.docker.desktop.group=platform-tooling"
+        nodeFilters:
+          - server:*
+          - agent:*
+          - loadbalancer
+      - label: "project=platform-tooling"
+        nodeFilters:
+          - server:*
+          - agent:*
+          - loadbalancer

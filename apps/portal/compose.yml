@@ -1,4 +1,4 @@
 services:
   portal:
     build: .
-    image: tooling-platform-portal:local
+    image: platform-tooling-portal:local

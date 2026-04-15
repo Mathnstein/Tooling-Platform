@@ -1,4 +1,4 @@
 services:
   gateway:
     build: .
-    image: tooling-platform-gateway:local
+    image: platform-tooling-gateway:local
