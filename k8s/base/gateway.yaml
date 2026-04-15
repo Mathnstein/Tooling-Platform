@@ -19,8 +19,17 @@ spec:
           envFrom:
             - configMapRef:
                 name: gateway-config
-            - secretRef:
-                name: messenger-credentials
+          env:
+            - name: MESSENGER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: messenger-credentials
+                  key: username
+            - name: MESSENGER_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: messenger-credentials
+                  key: password
           ports:
             - containerPort: 4000
 ---

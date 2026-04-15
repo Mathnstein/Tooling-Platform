@@ -1,5 +1,3 @@
-import amqp from 'amqplib';
-
 export type JobStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
 
 export interface CreateJobInput {
@@ -9,12 +7,12 @@ export interface CreateJobInput {
     submittedBy: string; // User who submitted the job
 }
 
+export interface CancelJobInput {
+    id: string;
+}
+
 export interface Job extends CreateJobInput {
     id: string;
     timeSubmitted: string;
     status: JobStatus;
-}
-
-export interface JobGQLContext {
-    amqpChannel: amqp.Channel;
 }
