@@ -16,6 +16,14 @@ export class CanceledJobStore {
     }
 
     /**
+     * Removes a job ID from the canceled list (if needed).
+     */
+    public remove(id: string): void {
+        this.store.delete(id);
+        console.log(`[Store] Job ${id} removed from canceled cache.`);
+    }
+
+    /**
      * Checks if a job has been canceled.
      */
     public has(id: string): boolean {

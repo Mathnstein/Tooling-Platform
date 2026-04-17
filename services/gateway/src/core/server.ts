@@ -13,7 +13,6 @@ import http from 'http';
 import 'reflect-metadata'; // Must be the first import for type-graphql to work properly
 import { buildSchema } from 'type-graphql';
 
-
 /**
  * GatewayServer is responsible for setting up and managing the GraphQL server that serves as the entry point for clients to interact with the system.
  * 

@@ -34,6 +34,12 @@ export class CancelJobInput {
     id: string;
 }
 
+@InputType()
+export class ReenableJobInput {
+    @Field(() => ID, { description: "The unique identifier of the job to be reenabled" })
+    id: string;
+}
+
 @ObjectType({ description: "Represents a job submitted to the system for processing. Contains details about the job's parameters, status, and metadata." })
 export class Job {
     @Field(() => ID, { description: "The unique identifier of the job" })

@@ -1,5 +1,5 @@
 import { GQLContext } from "#/interfaces/context.interface.js";
-import { CancelJobInput, CreateJobInput, Job, JobStatus } from "#/interfaces/job.interface.js";
+import { CancelJobInput, CreateJobInput, Job, JobStatus, ReenableJobInput } from "#/interfaces/job.interface.js";
 import { canceledJobStore } from "#/lib/stores/canceled-job.store.js";
 import { QUEUES } from "#/lib/utility/constants.js";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
@@ -43,7 +43,7 @@ export class JobResolvers extends BaseResolver {
      * @param param1 - The GraphQL context containing the AMQP channel.
      * @returns The newly created job.
      */
-    @Mutation(() => Job)
+    @Mutation(() => Job, { name: "createJob", description: "Creates a new job and publishes it to the RabbitMQ queue." })
     async createJob(
         @Arg("input", () => CreateJobInput) input: CreateJobInput,
         @Ctx() { amqpChannel }: GQLContext
@@ -81,6 +81,18 @@ export class JobResolvers extends BaseResolver {
     cancelJob(@Arg("input", () => CancelJobInput) input: CancelJobInput) {
         const { id } = input;
         canceledJobStore.add(id);
+        return true;
+    }
+
+    /**
+     * Reenables a job by removing its ID from the canceled job store.
+     * @param input - The input data containing the ID of the job to reenable.
+     * @returns A boolean indicating whether the job was successfully reenabled.
+     */
+    @Mutation(() => Boolean, { name: "reenableJob", description: "Reenables a job by removing its ID from the canceled job store." })
+    reenableJob(@Arg("input", () => ReenableJobInput) input: ReenableJobInput) {
+        const { id } = input;
+        canceledJobStore.remove(id);
         return true;
     }
 }

@@ -3,16 +3,14 @@
 import { ApolloLink, HttpLink } from "@apollo/client";
 import { ApolloClient, ApolloNextAppProvider, InMemoryCache, SSRMultipartLink } from "@apollo/client-integration-nextjs";
 
-
 function makeClient() {
-  const httpLink = new HttpLink({
-    // We use the environment variables from your generated .env
-    uri: `http://localhost:${
-      process.env.NEXT_PUBLIC_API_MODE === 'local' 
-        ? process.env.NEXT_PUBLIC_LOCAL_PORT 
-        : process.env.NEXT_PUBLIC_CLUSTER_PORT
-    }/graphql`,
-  });
+  const uri = `http://localhost:${
+      process.env.API_IN_CLUSTER === 'true' 
+        ? process.env.NEXT_PUBLIC_CLUSTER_PORT 
+        : process.env.NEXT_PUBLIC_LOCAL_PORT
+    }/graphql`;
+  const httpLink = new HttpLink({uri});
+  console.log("Connecting to API at:", uri);
 
   return new ApolloClient({
     cache: new InMemoryCache(),

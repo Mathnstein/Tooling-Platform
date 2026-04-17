@@ -81,7 +81,7 @@ sync-portal:
 sync-schema:
 	@echo "Generating GraphQL schema from Gateway and syncing to Portal..."
 	@npm run --prefix services/gateway generate:schema
-	@cp services/gateway/schema.gql apps/portal/schema.gql
+	@cp services/gateway/schema.graphql apps/portal/schema.graphql
 	@echo "Schema copied to Portal. Running codegen..."
 	@npm run --prefix apps/portal codegen
 	@echo "GraphQL schema synchronized between Gateway and Portal."

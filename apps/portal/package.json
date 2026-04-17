@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:local": "set NEXT_PUBLIC_API_MODE=local && next dev",
+    "dev:local": "set API_IN_CLUSTER=false && next dev",
     "build": "npm run codegen && next build",
     "start": "next start",
     "lint": "eslint",

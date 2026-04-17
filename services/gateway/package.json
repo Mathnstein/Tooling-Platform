@@ -10,7 +10,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "generate:schema": "tsx src/tools/generate-schema.ts"
+    "generate:schema": "set API_IN_CLUSTER=false && tsx src/tools/generate-schema.ts"
   },
   "keywords": [],
   "author": "",

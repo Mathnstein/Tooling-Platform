@@ -15,9 +15,7 @@ export default function Home() {
           </p>
         </div>
 
-        <JobButton />
         <CreateJobForm />
-        <JobCancelButton />
       </main>
     </div>
   );

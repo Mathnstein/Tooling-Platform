@@ -63,7 +63,12 @@ enum JobStatus {
 type Mutation {
   """Cancels a job by adding its ID to the canceled job store."""
   cancelJob(input: CancelJobInput!): Boolean!
+
+  """Creates a new job and publishes it to the RabbitMQ queue."""
   createJob(input: CreateJobInput!): Job!
+
+  """Reenables a job by removing its ID from the canceled job store."""
+  reenableJob(input: ReenableJobInput!): Boolean!
 }
 
 type Query {
@@ -77,6 +82,11 @@ type Query {
 
   """Gets a list of tools available to the user."""
   tools: [Tool!]!
+}
+
+input ReenableJobInput {
+  """The unique identifier of the job to be reenabled"""
+  id: ID!
 }
 
 type Tool {

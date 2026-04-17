@@ -47,4 +47,4 @@ k3d-config.yaml
 
 # Codegen - generated files should not be committed (except the schema.gql in the services/gateway)
 **/codegen/
-apps/portal/schema.gql
+apps/portal/schema.graphql
