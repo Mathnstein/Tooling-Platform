@@ -3,13 +3,20 @@
 import { useState } from 'react';
 import { graphql } from '#/codegen/gql';
 import { useLazyQuery } from '@apollo/client/react';
+import { Job } from '#/codegen/gql/graphql';
 
 // Define the query (Codegen will pick this up)
 const GET_JOBS = graphql(`
   query GetJobs {
     jobs {
       id
+      toolId
+      toolInput
+      timeToProcess
+      submittedBy
+      timeSubmitted
       status
+      isCanceled
     }
   }
 `);
@@ -18,6 +25,8 @@ export default function JobButton() {
   // Setup the query trigger
   // useLazyQuery is perfect for buttons—it doesn't run until you call 'getJobs'
   const [getJobs, { loading, data, error }] = useLazyQuery(GET_JOBS);
+
+  const jobs: Job[] = data?.jobs || [];
 
   return (
     <div className="space-y-4">

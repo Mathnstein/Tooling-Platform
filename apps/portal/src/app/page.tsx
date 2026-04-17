@@ -1,4 +1,6 @@
+import CreateJobForm from "#/components/CreateJobForm";
 import JobButton from "#/components/JobButton";
+import JobCancelButton from "#/components/JobCancelButton";
 
 export default function Home() {
   return (
@@ -14,6 +16,8 @@ export default function Home() {
         </div>
 
         <JobButton />
+        <CreateJobForm />
+        <JobCancelButton />
       </main>
     </div>
   );
