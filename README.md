@@ -8,7 +8,7 @@ The only requirements is that a tool has been dockerized, or already exists on a
 
 ## Architecture
 
-* **Gateway:** Apollo Router/Gateway (Node.js) serving as the single entry point.
+* **Gateway:** Apollo Router/GraphQL (Node.js) serving as the single entry point.
 * **Messenger Service:** RabbitMQ-backed microservice for asynchronous job processing.
 * **Portal:** Next.js frontend (App Router) for internal tooling management.
 * **Orchestration:** K3d (Lightweight Kubernetes) for local development parity.
@@ -25,13 +25,13 @@ Ensure you have the following installed:
 ## Quick Start (Local Development)
 
 ### 1. Spin up the CLuster
-```bash
-k3d cluster create tooling-cluster -p "8080:80@loadbalancer"
-```
-
 ### 2. Setup Environment variables
 ```bash
 make init-envs
+```
+
+```bash
+make cluser-up
 ```
 
 ### 3. Deploy the stack
@@ -50,7 +50,7 @@ make sync-all
 Useful Commands
 - _make logs_	Stream interleaved logs from all containers.
 - _make status_	Check the health of pods, services, and configmaps.
-
+- _make sync-schema_ Will generate the graphql schema and codegen into the portal
 
 ## Repo Layout
 ```
@@ -59,9 +59,7 @@ apps/                    # Top level dir for all applications
 └── ...others/
 k8s/
 ├── base/                # Core Blueprints (Deployments, Services)
-└── envs/                # Overlays
-    ├── dev/             # Local development configs & .env files
-    └── prod/            # Production scale and secrets (Encrypted/Ignored)
+└── envs/                # Overlays for the environments of each deployment
 services/
 └──  gateway/            # GraphQL API
 ```

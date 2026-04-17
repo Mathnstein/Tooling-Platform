@@ -1,6 +1,4 @@
-import { GQLContext } from '#/interfaces/context.interface.js';
 import { QueueClientService } from '#/lib/services/queue-client.service.js';
-import { IResolvers } from '@graphql-tools/utils';
 
 /**
  * Abstract Base class for all GraphQL resolvers.
@@ -65,11 +63,4 @@ export abstract class BaseResolver {
             })
             .filter((item): item is T => item !== null);
     }
-
-    /**
-     * Returns resolvers formatted for Apollo
-     */
-    public abstract getResolvers(): IResolvers<any, GQLContext>
-
-
 }

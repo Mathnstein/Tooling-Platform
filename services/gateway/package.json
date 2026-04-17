@@ -4,12 +4,13 @@
   "type": "module",
   "main": "index.js",
   "imports": {
-    "#/*": "./dist/lib/*.js"
+    "#/*": "./dist/*"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "generate:schema": "tsx src/tools/generate-schema.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,9 @@
     "@as-integrations/express5": "^1.1.2",
     "amqplib": "^1.0.3",
     "dotenv": "^17.4.2",
-    "graphql": "^16.13.2"
+    "graphql": "^16.13.2",
+    "reflect-metadata": "^0.2.2",
+    "type-graphql": "^2.0.0-rc.3"
   },
   "devDependencies": {
     "@graphql-tools/merge": "^9.1.8",

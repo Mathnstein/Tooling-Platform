@@ -1,6 +1,7 @@
 import { CONFIG } from '#/core/config.js';
 import { GQLContext } from '#/interfaces/context.interface.js';
-import { resolvers, typeDefs } from '#/lib/resolvers/index.js';
+import { JobResolvers } from '#/lib/resolvers/job.resolver.js';
+import { ToolResolvers } from '#/lib/resolvers/tool.resolver.js';
 import { MessengerService } from '#/lib/services/messenger.service.js';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -9,6 +10,9 @@ import { expressMiddleware } from '@as-integrations/express5';
 import cors from 'cors';
 import express, { Application } from 'express';
 import http from 'http';
+import 'reflect-metadata'; // Must be the first import for type-graphql to work properly
+import { buildSchema } from 'type-graphql';
+
 
 /**
  * GatewayServer is responsible for setting up and managing the GraphQL server that serves as the entry point for clients to interact with the system.
@@ -25,30 +29,38 @@ export class GatewayServer {
     private port: number;
 
     constructor() {
-        this.port = CONFIG.PORT || 4000;
+        this.port = CONFIG.PORT;
         this.app = express();
         this.httpServer = http.createServer(this.app);
         this.messengerService = new MessengerService();
+    }
 
-        // TODO: DISABLE LANDING PAGE IN PROD
-        const isDev = CONFIG.IS_DEV;
-
-        this.apolloServer = new ApolloServer<GQLContext>({
-            typeDefs,
-            resolvers,
-            // introspection: isDev,
-            plugins: [
-                ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
-                ApolloServerPluginLandingPageLocalDefault({ embed: true })
-                // isDev
-                //     ? ApolloServerPluginLandingPageLocalDefault({ embed: true })
-                //     : ApolloServerPluginLandingPageDisabled(),
-            ],
+    public async buildSchema() {
+        return buildSchema({
+            resolvers: [JobResolvers, ToolResolvers], // Register your resolver classes here
+            emitSchemaFile: !CONFIG.API_IN_CLUSTER,
+            validate: false,
         });
     }
 
     public async start(): Promise<void> {
         const channel = await this.messengerService.init();
+        const schema = await this.buildSchema();
+        // TODO: In production, consider disabling introspection and the landing page for security hardening. You can use the `isDev` flag to conditionally enable these features.
+        const isDev = CONFIG.IS_DEV;
+        this.apolloServer = new ApolloServer<GQLContext>({
+            schema,
+            introspection: true, // Allow tools to query the schema in development, disable in production for security
+            plugins: [
+                ApolloServerPluginDrainHttpServer({ httpServer: this.httpServer }),
+                ApolloServerPluginLandingPageLocalDefault({ embed: true })
+                // TODO: DISABLE LANDING PAGE IN PROD
+                // isDev
+                //     ? ApolloServerPluginLandingPageLocalDefault({ embed: true })
+                //     : ApolloServerPluginLandingPageDisabled(),
+            ],
+        });
+
         await this.apolloServer.start();
 
         this.app.use(

@@ -32,6 +32,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
+k3d-config.yaml
 .env*
 !*.example
 
@@ -43,3 +44,7 @@ yarn-error.log*
 
 # K8s Secrets & Environment-specific configs
 **/kubeconfig
+
+# Codegen - generated files should not be committed (except the schema.gql in the services/gateway)
+**/codegen/
+apps/portal/schema.gql

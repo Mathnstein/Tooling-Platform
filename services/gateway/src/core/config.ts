@@ -1,4 +1,3 @@
-// src/config.ts
 import 'dotenv/config';
 
 const getEnv = (key: string, defaultValue?: string): string => {
@@ -19,11 +18,11 @@ const getEnv = (key: string, defaultValue?: string): string => {
  */
 export const CONFIG = {
     PORT: parseInt(getEnv('PORT', '4000'), 10),
-    NODE_ENV: getEnv('NODE_ENV', 'development'),
     MESSENGER: {
         USER: getEnv('MESSENGER_USER'),
         PASS: getEnv('MESSENGER_PASS'),
         DOMAIN: getEnv('API_DOMAIN', 'localhost'),
     },
-    IS_DEV: getEnv('NODE_ENV', 'development') === 'development',
+    API_IN_CLUSTER: getEnv('API_IN_CLUSTER') === 'true',
+    IS_DEV: getEnv('NODE_ENV') === 'development',
 } as const; // 'as const' makes the config read-only

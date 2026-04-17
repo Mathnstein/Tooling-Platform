@@ -18,14 +18,15 @@ ENV PORT=3000
 RUN apk update && apk upgrade --no-cache
 
 # Create a non-root user for security
-RUN adduser -D nextjs
-USER nextjs
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
 # Copy standalone build from builder
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
 
+USER nextjs
 EXPOSE 3000
 
 CMD ["node", "server.js"]

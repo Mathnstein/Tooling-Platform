@@ -1,8 +1,8 @@
 import { GQLContext } from "#/interfaces/context.interface.js";
-import { CancelJobInput, CreateJobInput, Job } from "#/interfaces/job.interface.js";
+import { CancelJobInput, CreateJobInput, Job, JobStatus } from "#/interfaces/job.interface.js";
 import { canceledJobStore } from "#/lib/stores/canceled-job.store.js";
 import { QUEUES } from "#/lib/utility/constants.js";
-import { IResolvers } from "@graphql-tools/utils";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { BaseResolver } from "./base.resolver.js";
 
 /**
@@ -10,29 +10,18 @@ import { BaseResolver } from "./base.resolver.js";
  * This class extends the BaseResolver to leverage common functionality for interacting with RabbitMQ.
  * It provides resolvers for fetching jobs, creating new jobs, and canceling existing jobs.
  */
+@Resolver(() => Job)
 export class JobResolvers extends BaseResolver {
     constructor() {
         super(QUEUES.JOB_QUEUE);
-    }
-
-    public getResolvers(): IResolvers<any, GQLContext> {
-        return {
-            Query: {
-                jobs: () => this.getJobs(),
-                canceledJobs: () => this.getCanceledJobs(),
-            },
-            Mutation: {
-                createJob: (_, { input }, context) => this.createJob(input, context),
-                cancelJob: (_, { input }) => this.cancelJob(input),
-            }
-        };
     }
 
     /**
      * Fetches a list of jobs from the RabbitMQ queue.
      * @returns A promise that resolves to an array of jobs. Each job includes an `isCanceled` field that indicates whether the job has been canceled.
      */
-    private async getJobs() {
+    @Query(() => [Job], { name: "jobs", description: "Fetches a list of jobs from the queue. Each job includes an `isCanceled` field that indicates whether the job has been canceled." })
+    async getJobs() {
         return this.getAndProcessMessages<Job>(10, (parsed) => ({
             ...parsed,
             isCanceled: canceledJobStore.has(parsed.id),
@@ -43,7 +32,8 @@ export class JobResolvers extends BaseResolver {
      * Fetches a list of canceled jobs from the store.
      * @returns An array of canceled jobs.
      */
-    private getCanceledJobs() {
+    @Query(() => [Job], { name: "canceledJobs", description: "Fetches a list of canceled jobs from the store." })
+    getCanceledJobs() {
         return canceledJobStore.getAll();
     }
 
@@ -53,12 +43,16 @@ export class JobResolvers extends BaseResolver {
      * @param param1 - The GraphQL context containing the AMQP channel.
      * @returns The newly created job.
      */
-    private async createJob(input: CreateJobInput, { amqpChannel }: GQLContext) {
+    @Mutation(() => Job)
+    async createJob(
+        @Arg("input", () => CreateJobInput) input: CreateJobInput,
+        @Ctx() { amqpChannel }: GQLContext
+    ) {
         // Logic to create a job and publish to RabbitMQ
         const newJob: Job = {
             id: crypto.randomUUID(),
             timeSubmitted: new Date().toISOString(),
-            status: 'PENDING',
+            status: JobStatus.PENDING,
             ...input
         };
 
@@ -83,7 +77,8 @@ export class JobResolvers extends BaseResolver {
      * @param input - The input data containing the ID of the job to cancel.
      * @returns A boolean indicating whether the job was successfully canceled.
      */
-    private cancelJob(input: CancelJobInput) {
+    @Mutation(() => Boolean, { name: "cancelJob", description: "Cancels a job by adding its ID to the canceled job store." })
+    cancelJob(@Arg("input", () => CancelJobInput) input: CancelJobInput) {
         const { id } = input;
         canceledJobStore.add(id);
         return true;
