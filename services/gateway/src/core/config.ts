@@ -23,6 +23,7 @@ export const CONFIG = {
         PASS: getEnv('MESSENGER_PASS'),
         DOMAIN: getEnv('API_DOMAIN', 'localhost'),
     },
+    DATABASE_URL: getEnv('DATABASE_URL'),
     API_IN_CLUSTER: getEnv('API_IN_CLUSTER') === 'true',
     IS_DEV: getEnv('NODE_ENV') === 'development',
 } as const; // 'as const' makes the config read-only

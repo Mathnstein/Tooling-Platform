@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ToolType {
+  HEADLESS
+  HEADLESS_STACK
+  UI
+  UI_STACK
+}
+
+model Tool {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  icon        String
+  type        ToolType  @default(HEADLESS)
+  cliSchema   Json?
+  createdAt   DateTime  @default(now())
+  lastUpdated DateTime? @updatedAt
+  jobs        Job[]
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+model Job {
+  id              String     @id @default(uuid())
+  status          JobStatus  @default(PENDING)
+  toolId          String
+  tool            Tool       @relation(fields: [toolId], references: [id])
+  toolInput       Json       
+  submittedById   String
+  submittedBy     User       @relation(fields: [submittedById], references: [id])
+  timeSubmitted   DateTime   @default(now())
+}
+
+enum RoleType {
+  USER
+  ADMIN
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String
+  role        RoleType  @default(USER)
+  jobHistory  Job[]
+}

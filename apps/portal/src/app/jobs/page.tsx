@@ -11,8 +11,12 @@ const GET_JOBS = graphql(`
       id
       toolId
       toolInput
-      timeToProcess
-      submittedBy
+      submittedBy {
+        id
+        name
+        email
+        role
+      }
       timeSubmitted
       status
       isCanceled

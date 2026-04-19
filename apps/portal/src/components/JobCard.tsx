@@ -100,12 +100,14 @@ const handleToggleCancel = async () => {
         <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
           {job.toolId}
         </h3>
-        <p className="text-sm text-zinc-500 mb-4">Submitted by: {job.submittedBy}</p>
+        <p className="text-sm text-zinc-500 mb-4">Submitted by: {job.submittedBy.name}</p>
         
         <div className="bg-zinc-50 dark:bg-zinc-950 p-3 rounded-lg mb-4">
-          <p className="text-xs font-mono text-zinc-600 dark:text-zinc-400 truncate">
-            {job.toolInput}
-          </p>
+          <code className="text-xs text-zinc-600 dark:text-zinc-300 block truncate">
+            {typeof job.toolInput === 'object' 
+              ? JSON.stringify(job.toolInput) 
+              : job.toolInput}
+          </code>
         </div>
       </div>
 

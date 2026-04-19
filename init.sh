@@ -37,9 +37,17 @@ password=$MESSENGER_PASS
 API_DOMAIN=$API_DOMAIN_CLUSTER
 EOF
 
+# Generate k8s/envs/.env.database.secrets
+cat <<EOF > ./k8s/envs/.env.database.secrets
+# GENERATED FILE - DO NOT EDIT
+database=$DB_NAME
+username=$DB_USER
+password=$DB_PASS
+EOF
+
 echo "✅ K8s environment files synchronized from root .env"
 
-# 2. Sync Portal .env (Vite needs VITE_ prefix for browser safety)
+# Sync Portal .env (Vite needs VITE_ prefix for browser safety)
 cat <<EOF > ./apps/portal/.env
 # GENERATED FILE - DO NOT EDIT
 NEXT_PUBLIC_LOCAL_PORT=$LOCAL_GATEWAY_PORT
@@ -48,13 +56,22 @@ API_IN_CLUSTER=$API_IN_CLUSTER
 NODE_ENV=$NODE_ENV
 EOF
 
-# 3. Sync Gateway .env
+# Sync Gateway .env
+if [ "$API_IN_CLUSTER" = "true" ]; then
+  CURRENT_DB_URL="$DB_URL_CLUSTER"
+  CURRENT_API_DOMAIN=$API_DOMAIN_CLUSTER
+else
+  CURRENT_DB_URL="$DB_URL_LOCAL"
+  CURRENT_API_DOMAIN=$API_DOMAIN_LOCAL
+fi
+
 cat <<EOF > ./services/gateway/.env
 # GENERATED FILE - DO NOT EDIT
 PORT=$LOCAL_GATEWAY_PORT
 NODE_ENV=$NODE_ENV
 MESSENGER_USER=$MESSENGER_USER
 MESSENGER_PASS=$MESSENGER_PASS
+DATABASE_URL=$CURRENT_DB_URL
 API_DOMAIN=$API_DOMAIN_LOCAL
 API_IN_CLUSTER=$API_IN_CLUSTER
 EOF

@@ -18,9 +18,12 @@
   "dependencies": {
     "@apollo/server": "^5.5.0",
     "@as-integrations/express5": "^1.1.2",
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
     "amqplib": "^1.0.3",
     "dotenv": "^17.4.2",
     "graphql": "^16.13.2",
+    "graphql-type-json": "^0.3.2",
     "reflect-metadata": "^0.2.2",
     "type-graphql": "^2.0.0-rc.3"
   },
@@ -33,6 +36,7 @@
     "@types/node": "^25.6.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "prisma": "^7.7.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }

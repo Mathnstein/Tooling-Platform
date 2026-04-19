@@ -1,12 +1,7 @@
-import { Field, ID, InputType, Int, ObjectType, registerEnumType } from "type-graphql";
-
-export enum JobStatus {
-    PENDING = 'PENDING',
-    PROCESSING = 'PROCESSING',
-    COMPLETED = 'COMPLETED',
-    FAILED = 'FAILED',
-    CANCELED = 'CANCELED',
-}
+import { JobStatus } from "#/generated/prisma/enums.js";
+import { GraphQLJSONObject } from "graphql-type-json";
+import { Field, ID, InputType, ObjectType, registerEnumType, } from "type-graphql";
+import { User } from './user.interface.js';
 
 registerEnumType(JobStatus, {
     name: "JobStatus",
@@ -18,14 +13,11 @@ export class CreateJobInput {
     @Field(() => String, { description: "The unique identifier of the tool to be executed" })
     toolId: string;
 
-    @Field(() => String, { description: "The input provided to the tool for processing" })
-    toolInput: string;
-
-    @Field(() => Int, { description: "The time allocated for the job to process" })
-    timeToProcess: number;
+    @Field(() => GraphQLJSONObject, { description: "The input provided to the tool for processing" })
+    toolInput: any;
 
     @Field(() => String, { description: "The user who submitted the job" })
-    submittedBy: string;
+    submittedById: String;
 }
 
 @InputType()
@@ -48,17 +40,14 @@ export class Job {
     @Field(() => String, { description: "The unique identifier of the tool associated with the job" })
     toolId: string;
 
-    @Field(() => String, { description: "The input provided to the tool for processing" })
-    toolInput: string;
+    @Field(() => GraphQLJSONObject, { description: "The input provided to the tool for processing" })
+    toolInput: any;
 
-    @Field(() => Int, { description: "The time allocated for the job to process" })
-    timeToProcess: number;
+    @Field(() => User, { description: "The user who submitted the job" })
+    submittedBy: User;
 
-    @Field(() => String, { description: "The user who submitted the job" })
-    submittedBy: string;
-
-    @Field(() => String, { description: "The time when the job was submitted" })
-    timeSubmitted: string;
+    @Field(() => Date, { description: "The time when the job was submitted" })
+    timeSubmitted: Date;
 
     @Field(() => JobStatus, { description: "The current execution state of the job" })
     status: JobStatus;

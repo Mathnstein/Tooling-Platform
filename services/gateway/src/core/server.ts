@@ -2,6 +2,7 @@ import { CONFIG } from '#/core/config.js';
 import { GQLContext } from '#/interfaces/context.interface.js';
 import { JobResolvers } from '#/lib/resolvers/job.resolver.js';
 import { ToolResolvers } from '#/lib/resolvers/tool.resolver.js';
+import { prisma } from '#/lib/services/database.service.js';
 import { MessengerService } from '#/lib/services/messenger.service.js';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -67,7 +68,7 @@ export class GatewayServer {
             cors(),
             express.json(),
             expressMiddleware<GQLContext>(this.apolloServer, {
-                context: async () => ({ amqpChannel: channel }),
+                context: async () => ({ amqpChannel: channel, prisma }),
             })
         );
 

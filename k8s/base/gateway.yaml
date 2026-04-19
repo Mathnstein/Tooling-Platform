@@ -30,6 +30,13 @@ spec:
                 secretKeyRef:
                   name: messenger-credentials
                   key: password
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database-credentials
+                  key: password
+            - name: DATABASE_URL
+              value: "postgresql://postgres:$(POSTGRES_PASSWORD)@platform-tooling-db-service:5432/orkastrator"
           ports:
             - containerPort: 4000
 ---

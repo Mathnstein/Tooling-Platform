@@ -1,8 +1,9 @@
 import { GQLContext } from "#/interfaces/context.interface.js";
-import { CancelJobInput, CreateJobInput, Job, JobStatus, ReenableJobInput } from "#/interfaces/job.interface.js";
+import { CancelJobInput, CreateJobInput, Job, ReenableJobInput } from "#/interfaces/job.interface.js";
 import { canceledJobStore } from "#/lib/stores/canceled-job.store.js";
 import { QUEUES } from "#/lib/utility/constants.js";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { prisma } from "../services/database.service.js";
 import { BaseResolver } from "./base.resolver.js";
 
 /**
@@ -22,10 +23,11 @@ export class JobResolvers extends BaseResolver {
      */
     @Query(() => [Job], { name: "jobs", description: "Fetches a list of jobs from the queue. Each job includes an `isCanceled` field that indicates whether the job has been canceled." })
     async getJobs() {
-        return this.getAndProcessMessages<Job>(10, (parsed) => ({
-            ...parsed,
-            isCanceled: canceledJobStore.has(parsed.id),
-        }));
+        return await prisma.job.findMany({
+            include: {
+                submittedBy: true
+            }
+        });
     }
 
     /**
@@ -46,15 +48,20 @@ export class JobResolvers extends BaseResolver {
     @Mutation(() => Job, { name: "createJob", description: "Creates a new job and publishes it to the RabbitMQ queue." })
     async createJob(
         @Arg("input", () => CreateJobInput) input: CreateJobInput,
-        @Ctx() { amqpChannel }: GQLContext
+        @Ctx() { amqpChannel, prisma }: GQLContext
     ) {
         // Logic to create a job and publish to RabbitMQ
-        const newJob: Job = {
-            id: crypto.randomUUID(),
-            timeSubmitted: new Date().toISOString(),
-            status: JobStatus.PENDING,
-            ...input
-        };
+        const newJob = await prisma.job.create({
+            data: {
+                ...input,
+                submittedById: 'test-user-1',
+            },
+            include: {
+                submittedBy: true
+            }
+        });
+
+        console.log(newJob)
 
         if (!amqpChannel) {
             console.error('AMQP channel not available in context!');

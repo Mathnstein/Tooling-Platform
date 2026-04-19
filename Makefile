@@ -9,7 +9,9 @@ PORTAL_DIR=./apps/portal
 RABBIT_MGMT_PORT=15672
 RABBIT_AMQP_PORT=5672
 
-.PHONY: init-envs cluster-up cluster-down apply-all apply-portal apply-gateway sync-all sync-portal sync-schema sync-gateway logs status
+POSTGRES_DB_PORT=5432
+
+.PHONY: init-envs cluster-up cluster-down apply-all apply-portal apply-gateway sync-all sync-portal sync-schema sync-gateway logs status forward-rabbit forward-db forward-stop
 
 # Initialize environment files from examples
 init-envs:
@@ -43,6 +45,12 @@ forward-rabbit:
 	@kubectl port-forward svc/platform-tooling-messenger-service $(RABBIT_AMQP_PORT):5672 > /dev/null 2>&1 &
 	@echo "RabbitMQ UI: http://localhost:$(RABBIT_MGMT_PORT)"
 	@echo "RabbitMQ AMQP: amqp://localhost:$(RABBIT_AMQP_PORT)"
+	@echo "Run 'make forward-stop' to close connections."
+
+forward-db:
+	@echo "Forwarding Postgres port..."
+	@kubectl port-forward svc/platform-tooling-db-service $(POSTGRES_DB_PORT):5432 > /dev/null 2>&1 &
+	@echo "Postgres DB: http://localhost:$(POSTGRES_DB_PORT)"
 	@echo "Run 'make forward-stop' to close connections."
 
 forward-stop:

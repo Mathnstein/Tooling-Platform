@@ -10,3 +10,7 @@ secretGenerator:
   - name: messenger-credentials
     envs:
       - .env.messenger.secrets
+
+  - name: database-credentials
+    envs:
+      - .env.database.secrets

@@ -11,8 +11,9 @@ const CREATE_JOB_MUTATION = graphql(`
     createJob(input: $input) {
       toolId
       toolInput
-      timeToProcess
-      submittedBy
+      submittedBy {
+        name
+      }
     }
   }
 `);
@@ -22,8 +23,7 @@ export default function CreateJobForm() {
   const [formData, setFormData] = useState<CreateJobInput>({
     toolId: '',
     toolInput: '',
-    submittedBy: 'current-user', // Hardcoded for now
-    timeToProcess: 30
+    submittedById: 'current-user', // Hardcoded for now
   });
 
   const [createJob, { loading, error }] = useMutation(CREATE_JOB_MUTATION, {
@@ -34,15 +34,26 @@ export default function CreateJobForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let parsedInput = {};
+      try {
+        // If toolInput is already an object (initial state), use it. 
+        // If it's a string (from textarea), parse it.
+        parsedInput = typeof formData.toolInput === 'string' 
+          ? JSON.parse(formData.toolInput) 
+          : formData.toolInput;
+      } catch (parseError) {
+        alert("Invalid JSON format in Input Data field");
+        return;
+      }
       await createJob({
         variables: {
           input: {
             ...formData,
-            timeToProcess: Number(formData.timeToProcess)
+            toolInput: parsedInput
           }
         }
       });
-      setFormData(prev => ({ ...prev, toolId: '', toolInput: '' }));
+      setFormData(prev => ({ ...prev, toolId: '', toolInput: {} }));
     } catch (err) {
       console.error(err);
     }

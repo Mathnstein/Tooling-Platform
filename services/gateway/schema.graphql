@@ -10,17 +10,24 @@ input CancelJobInput {
 
 input CreateJobInput {
   """The user who submitted the job"""
-  submittedBy: String!
-
-  """The time allocated for the job to process"""
-  timeToProcess: Int!
+  submittedById: String!
 
   """The unique identifier of the tool to be executed"""
   toolId: String!
 
   """The input provided to the tool for processing"""
-  toolInput: String!
+  toolInput: JSONObject!
 }
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
+"""
+scalar DateTimeISO
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 """
 Represents a job submitted to the system for processing. Contains details about the job's parameters, status, and metadata.
@@ -36,19 +43,16 @@ type Job {
   status: JobStatus!
 
   """The user who submitted the job"""
-  submittedBy: String!
+  submittedBy: User!
 
   """The time when the job was submitted"""
-  timeSubmitted: String!
-
-  """The time allocated for the job to process"""
-  timeToProcess: Int!
+  timeSubmitted: DateTimeISO!
 
   """The unique identifier of the tool associated with the job"""
   toolId: String!
 
   """The input provided to the tool for processing"""
-  toolInput: String!
+  toolInput: JSONObject!
 }
 
 """The current execution state of a job"""
@@ -89,6 +93,12 @@ input ReenableJobInput {
   id: ID!
 }
 
+"""The type of user you are"""
+enum RoleType {
+  ADMIN
+  USER
+}
+
 type Tool {
   """Indicates whether the user has access to the tool"""
   hasAccess: Boolean!
@@ -101,4 +111,12 @@ type Tool {
 
   """The slug of the tool"""
   slug: String!
+}
+
+type User {
+  email: String!
+  id: ID!
+  jobHistory: [Job]
+  name: String!
+  role: RoleType!
 }
